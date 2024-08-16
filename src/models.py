@@ -7,23 +7,49 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
+class User(Base):
+    __tablename__ = 'user'
     # Here we define columns for the table person
     # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    userId = Column(Integer, primary_key=True)
+    userName = Column(String(25), unique=True)
+    firstName = Column(String(30),nullable=False)
+    lastName = Column(String(30),nullable=False)
+    email = Column(String(40), nullable=False)
+    follower = relationship("Follower", backref="follower")
+    post = relationship("Post", backref="post")
+    comment = relationship("Comment", backref="comment")
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+class Follower(Base):
+    __tablename__ = 'follower'
+    ID = Column(Integer, primary_key=True)
+    userFromId = Column(Integer, ForeignKey('user.userId'))
+    userToId = Column(Integer, ForeignKey('user.userId'))
+     
+
+class Post(Base):
+    __tablename__ = 'post'
+    ID = Column(Integer, primary_key=True)
+    userId = Column(Integer, ForeignKey('user.userId'))
+    media = relationship("Media", backref="media")
+    comment = relationship("Comment", backref="comment")
+    
+
+class Media(Base):
+    __tablename__ = 'media'
+    ID = Column(Integer, primary_key=True)
+    type = Column(String)
+    url = Column(String(50))
+    postId = Column(Integer, ForeignKey('post.ID'))
+
+class Comment(Base):
+    __tablename__ = 'comment'
+    ID = Column(Integer, primary_key=True)
+    commentText = Column(String(120))
+    authorId = Column(Integer, ForeignKey('user.userId'))
+    postId = Column(Integer, ForeignKey('post.ID'))
+
+
 
     def to_dict(self):
         return {}
